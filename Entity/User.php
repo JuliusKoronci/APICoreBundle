@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Traits\UserTrait;
 
 
 /**
@@ -27,6 +28,7 @@ class User implements AdvancedUserInterface , \Serializable
 {
 
     use FeaturedImageEntity;
+    use UserTrait;
 
     /**
      * @ORM\Id
@@ -102,13 +104,6 @@ class User implements AdvancedUserInterface , \Serializable
      */
     private $detailData;
 
-    /**
-     * @ORM\OneToMany(targetEntity="API\TaskBundle\Entity\Tag", mappedBy="createdBy")
-     * @Exclude()
-     *
-     * @var Tag
-     */
-    private $tags;
     /**
      * @ORM\ManyToOne(targetEntity="Company", inversedBy="users")
      * @ORM\JoinColumn(name="company_id", referencedColumnName="id")
@@ -387,40 +382,6 @@ class User implements AdvancedUserInterface , \Serializable
     {
 
         return $this->is_active;
-    }
-
-    /**
-     * Add tag
-     *
-     * @param Tag $tag
-     *
-     * @return User
-     */
-    public function addTag(Tag $tag)
-    {
-        $this->tags[] = $tag;
-
-        return $this;
-    }
-
-    /**
-     * Remove tag
-     *
-     * @param Tag $tag
-     */
-    public function removeTag(Tag $tag)
-    {
-        $this->tags->removeElement($tag);
-    }
-
-    /**
-     * Get tags
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getTags()
-    {
-        return $this->tags;
     }
 
     /**

@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\Annotation\ReadOnly;
 use JMS\Serializer\Annotation\Exclude;
+use Traits\UserDataTrait;
 
 /**
  * UserData
@@ -16,6 +17,7 @@ use JMS\Serializer\Annotation\Exclude;
  */
 class UserData
 {
+    use UserDataTrait;
     /**
      * @var int
      *
