@@ -16,7 +16,7 @@ class UserControllerTest extends ApiTestCase
     const BASE_URL = '/api/v1/core-bundle/users';
 
     /**
-     * GET LIST - success ..
+     * GET LIST - success
      */
     public function testListSuccess()
     {
@@ -25,7 +25,8 @@ class UserControllerTest extends ApiTestCase
         $this->assertEquals(UserRepository::DEFAULT_FIELDS, $keys);
 
         // Test List with custom data fields
-        $this->getClient()->request('GET', $this->getBaseUrl() . '?fields=name', [], [], ['Authorization' => 'Bearer ' . $this->adminToken, 'HTTP_AUTHORIZATION' => 'Bearer ' . $this->adminToken]);
+        $this->getClient()->request('GET', $this->getBaseUrl() . '?fields=name', [], [],
+            ['Authorization' => 'Bearer ' . $this->adminToken, 'HTTP_AUTHORIZATION' => 'Bearer ' . $this->adminToken]);
         $this->assertEquals(StatusCodesHelper::SUCCESSFUL_CODE, $this->getClient()->getResponse()->getStatusCode());
 
         // We expect at least one user and if we get a response based on custom fields e.g. only name
@@ -33,6 +34,16 @@ class UserControllerTest extends ApiTestCase
         $keys = array_keys($response['data'][0]);
         $this->assertTrue(array_key_exists('_links', $response));
         $this->assertEquals(['name', 'id'], $keys);
+
+        // Test List with only inActive users
+        $this->getClient()->request('GET', $this->getBaseUrl() . '?isActive=false', [], [],
+            ['Authorization' => 'Bearer ' . $this->adminToken, 'HTTP_AUTHORIZATION' => 'Bearer ' . $this->adminToken]);
+        $this->assertEquals(StatusCodesHelper::SUCCESSFUL_CODE, $this->getClient()->getResponse()->getStatusCode());
+
+        // We expect empty list
+        $response = json_decode($this->getClient()->getResponse()->getContent(), true);
+        $responseData = $response['data'];
+        $this->assertEquals(0, count($responseData));
     }
 
     /**
@@ -83,7 +94,8 @@ class UserControllerTest extends ApiTestCase
         ]);
 
         // Create Entity and add Company to this User(as admin)
-        $this->getClient(true)->request('POST', $this->getBaseUrl() . '/company/' . $company->getId(), $data, [], ['Authorization' => 'Bearer ' . $this->adminToken, 'HTTP_AUTHORIZATION' => 'Bearer ' . $this->adminToken]);
+        $this->getClient(true)->request('POST', $this->getBaseUrl() . '/company/' . $company->getId(), $data, [],
+            ['Authorization' => 'Bearer ' . $this->adminToken, 'HTTP_AUTHORIZATION' => 'Bearer ' . $this->adminToken]);
         $this->assertEquals(StatusCodesHelper::CREATED_CODE, $this->getClient()->getResponse()->getStatusCode());
 
         // We expect Entity, response has to include array with data and _links and data include's company param
@@ -245,7 +257,7 @@ class UserControllerTest extends ApiTestCase
 
         // Check if is_active param is 0
         $isActiveParam = $entity->getIsActive();
-//        $this->assertEquals(false,$isActiveParam);
+        $this->assertEquals(false, $isActiveParam);
     }
 
 

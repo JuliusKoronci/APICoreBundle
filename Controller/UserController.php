@@ -57,6 +57,10 @@ class UserController extends ApiBaseController implements ControllerInterface
      *       "description"="Custom fields to get only selected data, see options in list of parameters"
      *     },
      *     {
+     *       "name"="isActive",
+     *       "description"="Return's only ACTIVE users if this param is TRUE, only INACTIVE users if param is FALSE"
+     *     },
+     *     {
      *       "name"="page",
      *       "description"="Pagination, limit is set to 10 records"
      *     }
@@ -89,8 +93,9 @@ class UserController extends ApiBaseController implements ControllerInterface
 
         $fields = $request->get('fields') ? explode(',', $request->get('fields')) : [];
         $page = $request->get('page') ?: 1;
+        $isActive = $request->get('isActive') ?: 'all';
 
-        return $this->json($this->get('api_user.service')->getUsersResponse($fields, $page), StatusCodesHelper::SUCCESSFUL_CODE);
+        return $this->json($this->get('api_user.service')->getUsersResponse($fields, $page, $isActive), StatusCodesHelper::SUCCESSFUL_CODE);
 
     }
 
@@ -552,7 +557,6 @@ class UserController extends ApiBaseController implements ControllerInterface
      */
     public function deleteAction(int $id)
     {
-
         if (!$this->get('user_voter')->isGranted(VoteOptions::DELETE_USER, $id)) {
             return $this->accessDeniedResponse();
 

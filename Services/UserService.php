@@ -38,11 +38,12 @@ class UserService
      * Return Users Response  which includes Data and Links and Pagination
      *
      * @param array $fields
-     * @param int   $page
+     * @param int $page
      *
+     * @param string $isActive
      * @return array
      */
-    public function getUsersResponse(array $fields , int $page)
+    public function getUsersResponse(array $fields , int $page, $isActive)
     {
         if (0 === count($fields)) {
             $fields = UserRepository::DEFAULT_FIELDS;
@@ -50,7 +51,7 @@ class UserService
 
         /** @var UserRepository $userRepository */
         $userRepository = $this->em->getRepository('APICoreBundle:User');
-        $users = $userRepository->getCustomUsers($fields , $page);
+        $users = $userRepository->getCustomUsers($fields , $page, $isActive);
 
         $response = [
             'data' => $users ,
@@ -58,9 +59,10 @@ class UserService
         $pagination = HateoasHelper::getPagination(
             $this->router->generate('users_list') ,
             $page ,
-            $userRepository->countUsers(),
+            $userRepository->countUsers($isActive),
             UserRepository::LIMIT ,
-            $fields
+            $fields,
+            $isActive
         );
 
         return array_merge($response , $pagination);

@@ -1,6 +1,7 @@
 <?php
 
 namespace API\CoreBundle\Repository;
+
 use API\CoreBundle\Entity\User;
 use API\CoreBundle\Entity\UserData;
 use Doctrine\ORM\EntityRepository;
@@ -13,7 +14,7 @@ class UserRepository extends EntityRepository
     /**
      * Default User fields in case no custom fields are defined
      */
-    const DEFAULT_FIELDS = ['id' , 'email' , 'username', 'roles', 'is_active', 'acl'];
+    const DEFAULT_FIELDS = ['id', 'email', 'username', 'roles', 'is_active', 'acl'];
     const LIMIT = 10;
 
     /**
@@ -21,14 +22,14 @@ class UserRepository extends EntityRepository
      *
      * @param array $fields
      *
-     * @param int   $page
+     * @param int $page
      *
+     * @param string $isActive
      * @return array
-     * @throws \Doctrine\DBAL\DBALException
      */
-    public function getCustomUsers(array $fields = [] , int $page = 1)
+    public function getCustomUsers(array $fields = [], int $page = 1, $isActive)
     {
-        $query = $this->getUserQuery($fields);
+        $query = $this->getUserQuery($fields, $isActive);
 
         $query->setMaxResults(self::LIMIT);
 
@@ -45,24 +46,39 @@ class UserRepository extends EntityRepository
     /**
      * Return count of all users
      *
+     * @param string|bool $isActive
      * @return int
-     * @throws \Doctrine\DBAL\DBALException
      */
-    public function countUsers(): int
+    public function countUsers($isActive = false): int
     {
-        $query = $this->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        if ('true' == $isActive || 'false' == $isActive) {
+            if ($isActive == 'true') {
+                $isActiveParam = 1;
+            } else {
+                $isActiveParam = 0;
+            }
+            $query = $this->createQueryBuilder('u')
+                ->select('COUNT(u.id)')
+                ->where('u.is_active = :isActive')
+                ->setParameter('isActive', $isActiveParam)
+                ->getQuery()
+                ->getSingleScalarResult();
+        } else {
+            $query = $this->createQueryBuilder('u')
+                ->select('COUNT(u.id)')
+                ->getQuery()
+                ->getSingleScalarResult();
+        }
 
         return $query;
     }
 
     /**
      * @param array $fields
+     * @param string $isActive
      * @return \Doctrine\ORM\Query
      */
-    private function getUserQuery(array $fields = [])
+    private function getUserQuery(array $fields = [], $isActive)
     {
         $values = [];
         if (0 === count($fields)) {
@@ -76,19 +92,33 @@ class UserRepository extends EntityRepository
             if ('password' === $field) {
                 continue;
             }
-            if (property_exists(User::class , $field)) {
+            if (property_exists(User::class, $field)) {
                 $values[] = 'u.' . $field;
-            } elseif (property_exists(UserData::class , $field)) {
+            } elseif (property_exists(UserData::class, $field)) {
                 $values[] = 'd.' . $field;
             }
         }
-        if (!in_array('u.id' , $values , true)) {
+        if (!in_array('u.id', $values, true)) {
             $values[] = 'u.id';
         }
 
-        return $this->createQueryBuilder('u')
-            ->select($values)
-            ->leftJoin('u.detailData','d')
-            ->getQuery();
+        if ('true' == $isActive || 'false' == $isActive) {
+            if ($isActive == 'true') {
+                $isActiveParam = 1;
+            } else {
+                $isActiveParam = 0;
+            }
+            return $this->createQueryBuilder('u')
+                ->select($values)
+                ->where('u.is_active = :isActive')
+                ->leftJoin('u.detailData', 'd')
+                ->setParameter('isActive', $isActiveParam)
+                ->getQuery();
+        } else {
+            return $this->createQueryBuilder('u')
+                ->select($values)
+                ->leftJoin('u.detailData', 'd')
+                ->getQuery();
+        };
     }
 }
