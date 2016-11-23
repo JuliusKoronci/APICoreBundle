@@ -4,7 +4,7 @@
   "type": "symfony-bundle",
   "homepage": "https://github.com/JuliusKoronci/IgsemAPICoreBundle",
   "require": {
-    "php": ">=7.0.7",
+    "php": ">=7.0.1",
     "symfony/framework-bundle": "~2.3|~3.0",
     "jms/serializer-bundle": "^1.1",
     "nelmio/api-doc-bundle": "^2.13",
