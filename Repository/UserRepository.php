@@ -5,6 +5,7 @@ namespace API\CoreBundle\Repository;
 use API\CoreBundle\Entity\User;
 use API\CoreBundle\Entity\UserData;
 use Doctrine\ORM\EntityRepository;
+use Traits\UserRepositoryTrait;
 
 /**
  * UserRepository
@@ -16,6 +17,8 @@ class UserRepository extends EntityRepository
      */
     const DEFAULT_FIELDS = ['id', 'email', 'username', 'roles', 'is_active', 'acl'];
     const LIMIT = 10;
+
+    use UserRepositoryTrait;
 
     /**
      * Return all info about user (User, UserData Entity)

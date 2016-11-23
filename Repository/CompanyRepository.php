@@ -3,6 +3,7 @@
 namespace API\CoreBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Traits\CompanyRepositoryTrait;
 
 /**
  * CompanyRepository
@@ -13,6 +14,8 @@ use Doctrine\ORM\EntityRepository;
 class CompanyRepository extends EntityRepository implements RepositoryInterface
 {
     const LIMIT = 10;
+
+    use CompanyRepositoryTrait;
 
     /**
      * Return all entities with specific conditions based on actual Entity
