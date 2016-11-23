@@ -107,10 +107,8 @@ class UserVoter extends ApiBaseVoter implements VoterInterface
      */
     private function canDelete(int $user): bool
     {
-        if ($this->decisionManager->decide($this->token , ['ROLE_ADMIN'])) {
-            return true;
-        }
-        if ($user === $this->user->getId()) {
+        // Only ADMIN can delete user, he can't delete himselves
+        if ($this->decisionManager->decide($this->token , ['ROLE_ADMIN']) && $user !== $this->user->getId()) {
             return true;
         }
 

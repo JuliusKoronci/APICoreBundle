@@ -56,3 +56,10 @@ user_delete:
     methods: [DELETE]
     requirements:
         id: '\d+'
+
+user_restore:
+    path:     /users/{id}/restore
+    defaults: { _controller: APICoreBundle:User:restore }
+    methods: [PATCH]
+    requirements:
+        id: '\d+'

@@ -260,6 +260,34 @@ class UserControllerTest extends ApiTestCase
         $this->assertEquals(false, $isActiveParam);
     }
 
+    /**
+     * RESTORE SINGLE - success
+     */
+    public function testRestoreSingleSuccess()
+    {
+        // Find entity and Delete it
+        $entity = $this->findOneEntity();
+
+        $this->getClient(true)->request('DELETE', $this->getBaseUrl() . '/' . $entity->getId(),
+            [], [], ['Authorization' => 'Bearer ' . $this->adminToken, 'HTTP_AUTHORIZATION' => 'Bearer ' . $this->adminToken]);
+        $this->assertEquals(StatusCodesHelper::SUCCESSFUL_CODE, $this->getClient()->getResponse()->getStatusCode());
+
+        // Check if is_active param is 0 - entity is Deleted
+        $isActiveParam = $entity->getIsActive();
+        $this->assertEquals(false, $isActiveParam);
+
+        // Restore entity
+        $this->getClient(true)->request('PATCH', $this->getBaseUrl() . '/' . $entity->getId() . '/restore',
+            [], [], ['Authorization' => 'Bearer ' . $this->adminToken, 'HTTP_AUTHORIZATION' => 'Bearer ' . $this->adminToken]);
+        $this->assertEquals(StatusCodesHelper::SUCCESSFUL_CODE, $this->getClient()->getResponse()->getStatusCode());
+
+        $entityAfterChanges = $this->em->getRepository('APICoreBundle:User')->find($entity->getId());
+
+        // Check if is_active param is 1 - entity was Restored
+        $isActiveParam2 = $entityAfterChanges->getIsActive();
+        $this->assertEquals(true, $isActiveParam2);
+    }
+
 
     /**
      * Return Base URL

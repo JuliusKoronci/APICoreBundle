@@ -113,14 +113,14 @@ class UserController extends ApiBaseController implements ControllerInterface
      *           "detail_data":
      *           {
      *              "name": "Martina",
-     *              "surname": "Koronci Babinska",
+     *              "surname": "Kollar",
      *              "title_before": Mgr,
      *              "title_after": PhD,
      *              "function": "developer",
      *              "mobile": "00421 0987 544",
      *              "tel": 00421 0987 544,
      *              "fax": 00421 0987 544,
-     *              "signature": "Martina Koronci Babinska, WEB-SOLUTIONS",
+     *              "signature": "Martina Kollar, Web-Solutions",
      *              "street": "Nova 487",
      *              "city": "Bratislava",
      *              "zip": "025874",
@@ -211,14 +211,14 @@ class UserController extends ApiBaseController implements ControllerInterface
      *           "detail_data":
      *           {
      *              "name": "Martina",
-     *              "surname": "Koronci Babinska",
+     *              "surname": "Kollar",
      *              "title_before": null,
      *              "title_after": null,
      *              "function": "developer",
      *              "mobile": "00421 0987 544",
      *              "tel": null,
      *              "fax": null,
-     *              "signature": "Martina Koronci Babinska, WEB-SOLUTIONS",
+     *              "signature": "Martina Kollar, Web-Solutions",
      *              "street": "Nova 487",
      *              "city": "Bratislava",
      *              "zip": "025874",
@@ -320,14 +320,14 @@ class UserController extends ApiBaseController implements ControllerInterface
      *           "detail_data":
      *           {
      *              "name": "Martina",
-     *              "surname": "Koronci Babinska",
+     *              "surname": "Kollar",
      *              "title_before": null,
      *              "title_after": null,
      *              "function": "developer",
      *              "mobile": "00421 0987 544",
      *              "tel": null,
      *              "fax": null,
-     *              "signature": "Martina Koronci Babinska, WEB-SOLUTIONS",
+     *              "signature": "Martina Kollar, Web-Solutions",
      *              "street": "Nova 487",
      *              "city": "Bratislava",
      *              "zip": "025874",
@@ -428,14 +428,14 @@ class UserController extends ApiBaseController implements ControllerInterface
      *           "detail_data":
      *           {
      *              "name": "Martina",
-     *              "surname": "Koronci Babinska",
+     *              "surname": "Kollar",
      *              "title_before": null,
      *              "title_after": null,
      *              "function": "developer",
      *              "mobile": "00421 0987 544",
      *              "tel": null,
      *              "fax": null,
-     *              "signature": "Martina Koronci Babinska, WEB-SOLUTIONS",
+     *              "signature": "Martina Kollar, Web-Solutions",
      *              "street": "Nova 487",
      *              "city": "Bratislava",
      *              "zip": "025874",
@@ -559,15 +559,12 @@ class UserController extends ApiBaseController implements ControllerInterface
     {
         if (!$this->get('user_voter')->isGranted(VoteOptions::DELETE_USER, $id)) {
             return $this->accessDeniedResponse();
-
         }
 
         /** @var User $user */
         $user = $this->getDoctrine()->getRepository('APICoreBundle:User')->find($id);
         if (null === $user) {
-
             return $this->notFoundResponse();
-
         }
 
         $user->setIsActive(false);
@@ -577,6 +574,105 @@ class UserController extends ApiBaseController implements ControllerInterface
         return $this->createApiResponse([
             'message' => StatusCodesHelper::UNACITVATE_MESSAGE,
         ], StatusCodesHelper::SUCCESSFUL_CODE);
+    }
+
+
+    /**
+     * ### Response ###
+     *      ▿{
+     *         "data": ▿
+     *         {
+     *           "id": 12,
+     *           "username": "admin",
+     *           "email": "admin@admin.sk",
+     *           "roles": "[\"ROLE_ADMIN\"]",
+     *           "is_active": true,
+     *           "acl": "[]"
+     *           "detail_data":
+     *           {
+     *              "name": "Martina",
+     *              "surname": "Kollar",
+     *              "title_before": null,
+     *              "title_after": null,
+     *              "function": "developer",
+     *              "mobile": "00421 0987 544",
+     *              "tel": null,
+     *              "fax": null,
+     *              "signature": "Martina Kollar, Web-Solutions",
+     *              "street": "Nova 487",
+     *              "city": "Bratislava",
+     *              "zip": "025874",
+     *              "country": "SR"
+     *           },
+     *          "company":
+     *           {
+     *              "id": 1,
+     *              "title": "Web-Solutions",
+     *              "ico": "1102587",
+     *              "dic": "12587459644",
+     *              "street": "Cesta 125",
+     *              "city": "Bratislava",
+     *              "zip": "021478",
+     *              "country": "Slovenska Republika",
+     *              "is_active": true
+     *           }
+     *         },
+     *         "_links": ▿
+     *         {
+     *            "put": "/api/v1/core-bundle/users/12",
+     *            "patch": "/api/v1/core-bundle/users/12",
+     *            "delete": "/api/v1/core-bundle/users/12"
+     *         }
+     *      }
+     *
+     * @ApiDoc(
+     *  description="Restore User Entity",
+     *  requirements={
+     *     {
+     *       "name"="id",
+     *       "dataType"="integer",
+     *       "requirement"="\d+",
+     *       "description"="The id of processed object"
+     *     }
+     *  },
+     *  headers={
+     *     {
+     *       "name"="Authorization",
+     *       "required"=true,
+     *       "description"="Bearer {JWT Token}"
+     *     }
+     *  },
+     *  output={"class"="API\CoreBundle\Entity\User"},
+     *  statusCodes={
+     *      200 ="is_active param of Entity was successfully changed to active: 1",
+     *      401 ="Unauthorized request",
+     *      403 ="Access denied",
+     *      404 ="Not found user",
+     *  })
+     *
+     * @param int $id
+     *
+     * @return Response|JsonResponse
+     * @throws \LogicException
+     * @throws \InvalidArgumentException
+     */
+    public function restoreAction(int $id)
+    {
+        if (!$this->get('user_voter')->isGranted(VoteOptions::DELETE_USER, $id)) {
+            return $this->accessDeniedResponse();
+        }
+
+        /** @var User $user */
+        $user = $this->getDoctrine()->getRepository('APICoreBundle:User')->find($id);
+        if (null === $user) {
+            return $this->notFoundResponse();
+        }
+
+        $user->setIsActive(true);
+        $this->getDoctrine()->getManager()->persist($user);
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->createApiResponse($this->get('api_user.service')->getUserResponse($user), StatusCodesHelper::SUCCESSFUL_CODE);
     }
 
     /**
@@ -598,9 +694,7 @@ class UserController extends ApiBaseController implements ControllerInterface
         $statusCode = $this->getCreateUpdateStatusCode($create);
 
         if (null === $user || !$user instanceof User) {
-
             return $this->notFoundResponse();
-
         }
 
         $errors = $this->get('entity_processor')->processEntity($user, $requestData);
@@ -637,12 +731,10 @@ class UserController extends ApiBaseController implements ControllerInterface
                     $this->getDoctrine()->getManager()->persist($userData);
                     $this->getDoctrine()->getManager()->flush();
 
-
                     return $this->createApiResponse($this->get('api_user.service')->getUserResponse($user), $statusCode);
                 }
             } else {
                 return $this->createApiResponse($this->get('api_user.service')->getUserResponse($user), $statusCode);
-
             }
         }
 
