@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
 
 /**
  * Class JwtAuthenticator
@@ -56,9 +57,12 @@ class JwtAuthenticator extends AbstractGuardAuthenticator
 
     public function getUser($credentials , UserProviderInterface $userProvider)
     {
-        /** @var array $data */
-        $data = $this->jwtEncoder->decode($credentials);
-
+        try {
+            /** @var array $data */
+            $data = $this->jwtEncoder->decode($credentials);
+        } catch (JWTDecodeFailureException $e) {
+            throw new AuthenticationException(StatusCodesHelper::INVALID_JWT_TOKEN_MESSAGE , StatusCodesHelper::UNAUTHORIZED_CODE);
+        }
         if (!$data) {
             return;
         }
