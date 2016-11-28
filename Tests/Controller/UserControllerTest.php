@@ -281,11 +281,9 @@ class UserControllerTest extends ApiTestCase
             [], [], ['Authorization' => 'Bearer ' . $this->adminToken, 'HTTP_AUTHORIZATION' => 'Bearer ' . $this->adminToken]);
         $this->assertEquals(StatusCodesHelper::SUCCESSFUL_CODE, $this->getClient()->getResponse()->getStatusCode());
 
-        $entityAfterChanges = $this->em->getRepository('APICoreBundle:User')->find($entity->getId());
+        $response = json_decode($this->getClient()->getResponse()->getContent() , true);
 
-        // Check if is_active param is 1 - entity was Restored
-        $isActiveParam2 = $entityAfterChanges->getIsActive();
-        $this->assertEquals(true, $isActiveParam2);
+        $this->assertEquals(true , $response['data']['is_active']);
     }
 
 
